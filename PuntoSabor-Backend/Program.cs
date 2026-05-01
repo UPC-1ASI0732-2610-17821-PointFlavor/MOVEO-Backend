@@ -80,7 +80,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://localhost:5173",
                 "https://puntosabor.netlify.app",
-                "https://frontend-punto-sabor.vercel.app"
+                "https://frontend-punto-sabor.vercel.app",
+                "https://pflavor-frontend.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
