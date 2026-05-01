@@ -21,13 +21,28 @@ Console.WriteLine(">>> ENV DB_NAME: " + Environment.GetEnvironmentVariable("DB_N
 Console.WriteLine(">>> ENV DB_USER: " + Environment.GetEnvironmentVariable("DB_USER"));
 Console.WriteLine(">>> ENV DB_PASSWORD: " + Environment.GetEnvironmentVariable("DB_PASSWORD"));
 
-// Build connection string
-var connectionString =
-    $"server={Environment.GetEnvironmentVariable("DB_HOST")};" +
-    $"port={Environment.GetEnvironmentVariable("DB_PORT")};" +
-    $"database={Environment.GetEnvironmentVariable("DB_NAME")};" +
-    $"user={Environment.GetEnvironmentVariable("DB_USER")};" +
-    $"password={Environment.GetEnvironmentVariable("DB_PASSWORD")}";
+// Build connection string from env or config fallback
+var envHost = Environment.GetEnvironmentVariable("DB_HOST");
+var envPort = Environment.GetEnvironmentVariable("DB_PORT");
+var envName = Environment.GetEnvironmentVariable("DB_NAME");
+var envUser = Environment.GetEnvironmentVariable("DB_USER");
+var envPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+var hasEnvConnection =
+    !string.IsNullOrWhiteSpace(envHost) &&
+    !string.IsNullOrWhiteSpace(envPort) &&
+    !string.IsNullOrWhiteSpace(envName) &&
+    !string.IsNullOrWhiteSpace(envUser) &&
+    !string.IsNullOrWhiteSpace(envPassword);
+
+var connectionString = hasEnvConnection
+    ? $"server={envHost};port={envPort};database={envName};user={envUser};password={envPassword}"
+    : builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Missing database connection string. Set env vars or ConnectionStrings:DefaultConnection.");
+}
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
