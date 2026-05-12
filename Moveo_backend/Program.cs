@@ -84,27 +84,7 @@ builder.Services.AddCors(options =>
 });
 
 // ------------------------- DbContext & MySQL -------------------------
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (string.IsNullOrEmpty(connectionString))
-        throw new InvalidOperationException("Database connection string is not set.");
-    
-    // Usar versión fija en lugar de AutoDetect para evitar errores de conexión al iniciar
-    options.UseMySql(connectionString, 
-                     new MySqlServerVersion(new Version(8, 0, 21)),
-                     mySqlOptions =>
-                     {
-                         // Reintentar conexión si falla (útil en Railway)
-                         mySqlOptions.EnableRetryOnFailure(
-                             maxRetryCount: 5,
-                             maxRetryDelay: TimeSpan.FromSeconds(10),
-                             errorNumbersToAdd: null);
-                     })
-           .LogTo(Console.WriteLine, LogLevel.Information)
-           .EnableSensitiveDataLogging()
-           .EnableDetailedErrors();
-});
+builder.Services.AddAppDbContext(builder.Configuration);
 
 // ------------------------- Shared Dependencies -------------------------
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
