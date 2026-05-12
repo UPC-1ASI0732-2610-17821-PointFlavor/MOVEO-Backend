@@ -1,20 +1,12 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-COPY PuntoSabor-Backend.sln .
-COPY PuntoSabor-Backend/ ./PuntoSabor-Backend/
-
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app
-
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
 WORKDIR /app
+COPY Moveo_backend/*.csproj Moveo_backend/
+RUN dotnet restore ./Moveo_backend
+COPY . .
+RUN dotnet publish ./Moveo_backend -c Release -o out /p:UseAppHost=false
 
-COPY --from=build /app .
-
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080
-EXPOSE 8080
-
-ENTRYPOINT ["dotnet", "PuntoSabor-Backend.dll"]
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=builder /app/out .
+EXPOSE 80
+ENTRYPOINT ["dotnet", "Moveo_backend.dll"]
