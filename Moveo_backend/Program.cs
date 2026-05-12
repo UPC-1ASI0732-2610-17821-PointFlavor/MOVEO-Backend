@@ -1,9 +1,5 @@
-using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Moveo_backend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Moveo_backend.Shared.Domain.Repositories;
@@ -12,7 +8,6 @@ using Moveo_backend.Shared.Infrastructure.Persistence.EFC.Repositories;
 using Moveo_backend.IAM.Domain.Services;
 using Moveo_backend.IAM.Application.Internal;
 using Moveo_backend.IAM.Infrastructure.Hashing;
-using Moveo_backend.IAM.Infrastructure.Tokens;
 // UserManagement
 using Moveo_backend.UserManagement.Domain.Repositories;
 using Moveo_backend.UserManagement.Domain.Services;
@@ -70,32 +65,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API para la plataforma de alquiler de vehículos MOVEO"
     });
-
-    // Configurar JWT en Swagger
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Ingresa tu token JWT. Ejemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
 });
 
 // ------------------------- CORS -------------------------
@@ -140,44 +109,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ------------------------- Shared Dependencies -------------------------
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// ------------------------- IAM / JWT Authentication -------------------------
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+// ------------------------- IAM -------------------------
 builder.Services.AddScoped<IHashingService, BcryptHashingService>();
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-// JWT Authentication
-var jwtSecret = builder.Configuration["JwtSettings:Secret"];
-var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
-var jwtAudience = builder.Configuration["JwtSettings:Audience"];
-
-if (!string.IsNullOrEmpty(jwtSecret) && !string.IsNullOrEmpty(jwtIssuer) && !string.IsNullOrEmpty(jwtAudience))
-{
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-            ValidateIssuer = true,
-            ValidIssuer = jwtIssuer,
-            ValidateAudience = true,
-            ValidAudience = jwtAudience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-    builder.Services.AddAuthorization();
-}
-else
-{
-    Console.WriteLine("⚠️ JWT Settings no configurados correctamente");
-}
 
 // ------------------------- UserManagement Dependencies -------------------------
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -249,8 +183,6 @@ app.UseCors("AllowMoveoFrontend");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";

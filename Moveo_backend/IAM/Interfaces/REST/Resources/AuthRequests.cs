@@ -22,14 +22,9 @@ public class RegisterRequest
     public UserPreferences? Preferences { get; set; }
 }
 
-public class RefreshTokenRequest
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
-}
-
 public class ChangePasswordRequest
 {
+    public int UserId { get; set; }
     public string CurrentPassword { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }

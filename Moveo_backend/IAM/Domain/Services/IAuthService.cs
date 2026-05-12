@@ -5,10 +5,8 @@ namespace Moveo_backend.IAM.Domain.Services;
 
 public interface IAuthService
 {
-    Task<AuthResponse?> LoginAsync(LoginCommand command);
-    Task<AuthResponse?> RegisterAsync(RegisterCommand command);
-    Task<AuthResponse?> RefreshTokenAsync(RefreshTokenCommand command);
-    Task<bool> LogoutAsync(int userId);
+    Task<AuthenticatedUserResource?> LoginAsync(LoginCommand command);
+    Task<AuthenticatedUserResource?> RegisterAsync(RegisterCommand command);
     Task<AuthenticatedUserResource?> GetCurrentUserAsync(int userId);
     Task<bool> ChangePasswordAsync(int userId, AuthChangePasswordCommand command);
 }

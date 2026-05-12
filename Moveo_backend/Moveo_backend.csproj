@@ -30,10 +30,6 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
         <!-- BCrypt Encription related packages -->
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-        <!-- JSON Web Token related packages -->
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
         <!-- Mediator pattern related packages -->
         <PackageReference Include="Cortex.Mediator" Version="2.1.0" />
     </ItemGroup>
