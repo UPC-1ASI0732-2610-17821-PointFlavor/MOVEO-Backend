@@ -176,3 +176,5 @@ app.MapControllers();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
 await app.RunAsync();
+
+public partial class Program { }

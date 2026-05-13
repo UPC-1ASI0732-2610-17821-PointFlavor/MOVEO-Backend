@@ -32,7 +32,6 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.AddCreatedUpdatedInterceptor();
         base.OnConfiguring(optionsBuilder);
     }
 

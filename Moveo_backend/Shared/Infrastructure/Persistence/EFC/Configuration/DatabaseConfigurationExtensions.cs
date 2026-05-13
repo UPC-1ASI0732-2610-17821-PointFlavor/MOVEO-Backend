@@ -1,3 +1,4 @@
+using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +28,8 @@ public static class DatabaseConfigurationExtensions
                              })
                    .LogTo(Console.WriteLine, LogLevel.Information)
                    .EnableSensitiveDataLogging()
-                   .EnableDetailedErrors();
+                   .EnableDetailedErrors()
+                   .AddCreatedUpdatedInterceptor();
         });
 
         return services;
