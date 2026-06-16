@@ -162,8 +162,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine(ex.Message);
         if (ex.InnerException != null)
             Console.WriteLine($"InnerException: {ex.InnerException.Message}");
-        // No relanzamos: si la BD falla, dejamos que la app siga viva para que
-        // siga respondiendo (health checks, CORS, etc.) en lugar de tumbar todo el servicio.
+        throw;
     }
 }
 
