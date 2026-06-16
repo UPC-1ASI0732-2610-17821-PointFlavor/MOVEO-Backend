@@ -35,10 +35,9 @@ public static class DatabaseConfigurationExtensions
 
     private static string? ResolveConnectionString(IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        if (!string.IsNullOrWhiteSpace(connectionString))
-            return connectionString;
-
+        // Railway (and other PaaS) inject connection details via environment variables.
+        // These take precedence over the hardcoded DefaultConnection so deployments always
+        // use the live credentials, even if appsettings holds a stale password.
         var mysqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL")
             ?? Environment.GetEnvironmentVariable("DATABASE_URL");
         if (!string.IsNullOrWhiteSpace(mysqlUrl) && TryBuildMySqlConnectionString(mysqlUrl, out var urlConnectionString))
@@ -55,6 +54,11 @@ public static class DatabaseConfigurationExtensions
             var portValue = string.IsNullOrWhiteSpace(port) ? "3306" : port;
             return $"Server={host};Port={portValue};Database={database};User={user};Password={password};";
         }
+
+        // Fallback for local development.
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (!string.IsNullOrWhiteSpace(connectionString))
+            return connectionString;
 
         return null;
     }
