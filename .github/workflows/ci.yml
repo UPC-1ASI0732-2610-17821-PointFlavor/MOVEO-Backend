@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Moveo_backend.Tests/Moveo_backend.Tests.csproj
+
+      - name: Build
+        run: dotnet build Moveo_backend.Tests/Moveo_backend.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Moveo_backend.Tests/Moveo_backend.Tests.csproj --configuration Release --no-build --verbosity normal
